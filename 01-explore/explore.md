@@ -127,8 +127,8 @@ Depending upon your topology it may also be on a separate machine, rack or site 
 As more cache servers are added there is additional memory capacity as well as processing capacity allowing parallel queries to more efficiently run.
 
 1. On the bottom right panel click `Add Servers` and enter 3 as the number of addition servers to add.
-   
-  ![Add Servers](images/add-servers.png "Add Servers")
+ 
+   ![Add Servers](images/add-servers.png "Add Servers")
 
 2. You will notice the data distribution changing and then finally stabilizing at 4 servers with each server
    holding an almost equal portion of the data.
