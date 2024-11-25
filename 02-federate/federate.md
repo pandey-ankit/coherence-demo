@@ -9,7 +9,7 @@ Federated caching federates cache data asynchronously across multiple geographic
 dispersed clusters. Cached data is federated across clusters to provide redundancy, 
 off-site backup, and multiple points of access for application users in different geographical locations.
 
-Estimated time: 20 minutes
+Estimated time: 10 minutes
 
 ### Objectives
 
@@ -33,7 +33,7 @@ In this lab, you will:
 
    ![Federation Start](images/federation-header.png "Federation Start")
 
-   If you have "Insight" enabled, a dialog will be displayed showing how federation is setup in configuration only and no actual application code changes are required.
+   If you have "Insight" enabled, a dialog will be displayed showing how federation is setup in configuration only. No actual application code changes are required.
 
 2. Select `Dashboard` on the `Federation` menu to open the secondary cluster dashboard. In our case the secondary cluster is "San Francisco".
  

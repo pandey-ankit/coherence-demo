@@ -18,7 +18,7 @@ accept the gRPC connections and carry out work on behalf of the clients.
 
 > Note: You can inspect the source code for each of the clients in the last lab.
 
-Estimated time: 20 minutes
+Estimated time: 10 minutes
 
 ### Objectives
 
@@ -34,6 +34,8 @@ In this lab, you will:
 
 ## Task 1: Monitor Prices Using Python
 
+> Note: Ensure you have enabled price updated in the primary cluster.
+
 1. Open a new terminal by using `File` -> `New Tab` in the existing terminal.
 
    ![New Terminal](images/new-terminal.png "New Terminal")
@@ -41,13 +43,13 @@ In this lab, you will:
 2. Change to the following directory:
 
    ```bash
-   cd ~/coherence-demo/clients/py
+   cd coherence-demo/clients/py
    ```                           
     
 3. Run the python command to monitor prices:
 
    ```bash
-   python3 main.py monitor
+   python3.8 main.py monitor
    ```         
    
    Because prices updates are still on via the dashboard, you should see the updates prices being displayed similar to below:
@@ -68,7 +70,7 @@ In this lab, you will:
 2. Change to the following directory:
 
    ```bash
-   cd ~/coherence-demo/clients/js
+   cd coherence-demo/clients/js
    ```
                               
 3. Issue the following to view the options applicable to the JavaScript client:
@@ -101,7 +103,9 @@ In this lab, you will:
    ```bash
    2024-11-25 09:13:49,674: Adding 5000 random trades for ORCL...
    2024-11-25 09:13:50,604: Trades cache size is now 111000
-   ```     
+   ```      
+   
+   > Note: Confirm in the primary and secondary cluster dashboards that the trade count has increased for the `ORCL` stock.
    
 ## Task 3: Issue a Stock Spit using Go
 
@@ -112,7 +116,7 @@ In this lab, you will:
 3. Change to the following directory:
 
    ```bash
-   cd ~/coherence-demo/clients/go
+   cd coherence-demo/clients/go
    ```
 
 4. Create an Executable Go Binary using the following:
@@ -133,6 +137,8 @@ In this lab, you will:
    2024/11/25 01:24:56 Updated price for 27622 trades
    2024/11/25 01:24:56 Updated price for ORCL from $22.21 to $7.40
     ```
+          
+> Note: If you have time you can explore the three clients and run various commands in each of the clients.
 
 ## Learn More
                                                                         

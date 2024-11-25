@@ -6,7 +6,7 @@ This lab walks you through the application code allowing you to gain an understa
 
 > Note: You can choose any of the languages you wish to inspect.
 
-Estimated time: 30 minutes
+Estimated time: 10 minutes
 
 ### Objectives
 
@@ -40,14 +40,14 @@ direct GitHub links.
 
 **Source Files**
 
-| Package                                             | Class                     | Usage                                          | GitHub Link                                                                                                                                                                |
-|-----------------------------------------------------|---------------------------|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| src/main/java/com/oracle/coherence/demo/application | BootstrapInterceptor.java | Code executed on startup                       | [BootstrapInterceptor.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/BootstrapInterceptor.java) |
-| src/main/java/com/oracle/coherence/demo/application | ChartDataResource.java    | JAX-RS Endpoint to carry out data aggregation  | [ChartDataResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)       |
-| src/main/java/com/oracle/coherence/demo/application | EventsResource.java       | JAX-RS Endpoint to listen for events           | [EventsResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)             |
-| src/main/java/com/oracle/coherence/demo/application | Utilities.java            | JVarious utilities for working with cache data | [Utilities.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Utilities.java)                       |
-| src/main/java/com/oracle/coherence/demo/cachestore  |                           | Contains cache store JPA Code                  | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/cachestore)                                                 |
-| src/main/java/com/oracle/coherence/demo/model       |                           | Contains cache model classes                   | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/model)                                                      |
+| Package                                             | Class                     | Usage                                         | GitHub Link                                                                                                                                                                |
+|-----------------------------------------------------|---------------------------|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| src/main/java/com/oracle/coherence/demo/application | BootstrapInterceptor.java | Code executed on startup                      | [BootstrapInterceptor.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/BootstrapInterceptor.java) |
+| src/main/java/com/oracle/coherence/demo/application | ChartDataResource.java    | JAX-RS Endpoint to carry out data aggregation | [ChartDataResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)       |
+| src/main/java/com/oracle/coherence/demo/application | EventsResource.java       | JAX-RS Endpoint to listen for events          | [EventsResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)             |
+| src/main/java/com/oracle/coherence/demo/application | Utilities.java            | Various utilities for working with cache data | [Utilities.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Utilities.java)                       |
+| src/main/java/com/oracle/coherence/demo/cachestore  |                           | Contains cache store JPA Code                 | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/cachestore)                                                 |
+| src/main/java/com/oracle/coherence/demo/model       |                           | Contains cache model classes                  | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/model)                                                      |
 
 **Configuration Files**  
  

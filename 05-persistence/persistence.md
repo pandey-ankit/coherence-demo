@@ -26,7 +26,7 @@ In this lab, you will:
 ## Task 1: Create a Snapshot
  
 1. Switch to the primary cluster dashboard and use `Persistence` -> `Create Snapshot` to create a snapshot of the current cache data.
-   Wait for confirmation that the snapshot has been created before continuing.
+   Wait for confirmation that the snapshot has been created before continuing.  Note the count of the `Positions`.
 
    ![Create Snapshot](images/create-snapshot.png "Create Snapshot")
 
@@ -34,7 +34,7 @@ In this lab, you will:
 
 ## Task 2: Clear the primary data
 
-1. Use `Tools` -> `Clear Cache` to remove the cache data from the primary cluster. As we have federation, this will be replicated to the secondary cluster.
+1. Use `Tools` -> `Clear Cache` to remove the cache data from the primary cluster. As we have federation configured, this will be replicated to the secondary cluster.
 
    ![Clear Cache](images/clear-cache.png "Clear Cache")
 

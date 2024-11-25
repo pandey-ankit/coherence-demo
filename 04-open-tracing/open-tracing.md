@@ -5,7 +5,7 @@
 This lab will walk you through using OpenTracing to gain visibility in cache operations from the UI,
 to the cache server and all the way through to the cache store write.
 
-Estimated time: 20 minutes
+Estimated time: 10 minutes
 
 ### Objectives
 
@@ -45,8 +45,12 @@ In this lab, you will:
 1. Access the primary cluster console and choose `Tools` -> `Configure Tracing`.
 
    ![Enable Tracing](images/enable-tracing.png "Enable Tracing")
-   
-   > Note: Wait o few minutes to ensure tracing has been picked up by the Docker image.
+      
+2. You should see in the bottom right panel that tracing has been enabled for each cluster member. 
+
+   ![Tracing Enabled](images/tracing-enabled.png "Tracing Enabled")
+      
+   > Note: Wait a few minutes to ensure tracing has been picked up by the Docker image.
    
 ## Task 3: Search for Traces
 
@@ -69,6 +73,8 @@ In this lab, you will:
    ![Narrow Trace](images/narrow.png "Narrow Trace")
 
 ## Task 4: Inspect and Understand the Traces
+
+> Note: If you don't see the traces as described below, wait a few minutes and ensure you have enabled price updates.
   
 For this task there is a number, e.g.`[1]` in a square bracket on the image below the corresponds to each of the steps below:
 
@@ -78,9 +84,9 @@ For this task there is a number, e.g.`[1]` in a square bracket on the image belo
 
   ![Step 1](images/step-1.png "Step 1")
  
-2. Click on `Update Prices` and then `Invoke.request` and expand the `Tags` on the `Invoke.request`. This shows
+2. Click on `Utilities.UpdatePrices` and then `Invoke.request` and expand the `Tags` on the `Invoke.request`. This shows
    The invocation of the entry processor to do the price updates. Entry processors allow you to send processing to where
-   the data is rather than retrieving the data. This is much more efficient.
+   the data is rather than retrieving the data. This is much more efficient as you are not sending and receiving the data, just the logic to process it.
   
    ![Step 2](images/step-2.png "Step 2")
 
@@ -90,9 +96,12 @@ For this task there is a number, e.g.`[1]` in a square bracket on the image belo
 
   ![Step 3](images/step-3.png "Step 3")
 
-4. Expand the `BackupAll.request` and the `BackupAll.process`. The `BackupAll.request` is the member on which the primary data resides and requests the backup. In our
-   case, member 1. The `BackupAll.process` is where the backup is processed and located, which in our case is member 2. 
-   This shows how Coherence will not location the primary and backup data in the same place for high-availability.
+4. Expand the `BackupAll.request` and the `BackupAll.process`. 
+
+   1. The `BackupAll.request` is the member on which the primary data resides and this member requests the backup. In our
+   case, member 1. 
+   2. The `BackupAll.process` is where the backup is processed and located, which in our case is member 2. 
+   This shows how Coherence will not locate the primary and backup data in the same place to ensure high-availability.
       
   ![Step 4](images/step-4.png "Step 4")
 

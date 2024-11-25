@@ -5,7 +5,7 @@
 This lab walks you through starting the fictitious stock application and exploring application functionality.
 
 The application is web-based, using Angular and Bootstrap, with the UI accessing Coherence via JAX-RS endpoints.
-For this Lab it is run standalone on a VM but can also be deployed to Kubernetes via the Coherence Operator.
+For this Lab it is run standalone on a VM but can also be deployed to Kubernetes via the [Coherence Operator](https://github.com/oracle/coherence-operator).
 
 The application uses the “Oracle Bedrock” framework to start/stop additional Coherence processes as well as a secondary cluster for Federation.
 
@@ -14,7 +14,7 @@ to showcase Federation capabilities.
 
 ![Coherence Demo](images/screenshot.png "Coherence Demo Application")
 
-Estimated time: 20 minutes
+Estimated time: 10 minutes
 
 ### Objectives
 
@@ -141,7 +141,7 @@ As more cache servers are added there is additional memory capacity as well as p
    > Note: If you scale the servers too high in this VM environment, the times will not continue increasing due to CPU constraints.
 
 4. Select `Server 4` on the bottom right panel and select `Stop Server`. This will terminate the server
-   immediately simulating a failure. Coherence will automatically detect this failre and re-balance the data while the
+   immediately simulating a failure. Coherence will automatically detect this failre and re-balance the data while
    the application is continuing without interruption keeping the data consistent. Any missing primary data will have their backups promoted
    to primary and new backups made for missing backups.
 
