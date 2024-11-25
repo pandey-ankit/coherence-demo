@@ -5,7 +5,7 @@
 This lab will walk you through using OpenTracing to gain visibility in cache operations from the UI,
 to the cache server and all the way through to the cache store write.
 
-Estimated time: 15 minutes
+Estimated time: 20 minutes
 
 ### Objectives
 

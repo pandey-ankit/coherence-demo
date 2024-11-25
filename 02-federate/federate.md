@@ -9,7 +9,7 @@ Federated caching federates cache data asynchronously across multiple geographic
 dispersed clusters. Cached data is federated across clusters to provide redundancy, 
 off-site backup, and multiple points of access for application users in different geographical locations.
 
-Estimated time: 10 minutes
+Estimated time: 20 minutes
 
 ### Objectives
 
