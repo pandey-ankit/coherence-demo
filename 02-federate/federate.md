@@ -22,7 +22,7 @@ In this lab, you will:
 
 ### Prerequisite
 
-* You should have completed the previous lab.
+* You should have completed the previous labs.
 
 ## Task 1: Start Federation
 
