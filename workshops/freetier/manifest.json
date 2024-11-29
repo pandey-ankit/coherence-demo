@@ -1,5 +1,5 @@
 {
-    "workshoptitle": "The Lifecycle of Helidon Microservice Application Development with OCI DevOps service",
+    "workshoptitle": "Coherence Demonstration Application",
     "help": "livelabs-help-weblogic_us@oracle.com",
     "tutorials": [
         {
@@ -13,34 +13,34 @@
             "filename": "https://oracle-livelabs.github.io/common/labs/cloud-login/pre-register-free-tier-account.md"
         },
         {
-            "title": "Lab 1: Provision the Infrastructure",
+            "title": "Lab 1: Explore the Demonstration Application",
             "type": "freetier",
-            "filename": "../../lab1/lab1.md"
+            "filename": "../../explore/explore.md"
         },
         {
-            "title": "Lab 2: Generate Helidon MP application",
+            "title": "Lab 2: Federate Data Between Clusters",
             "type": "freetier",
-            "filename": "../../lab2/lab2.md"
+            "filename": "../../federate/federate.md"
         },
         {
-            "title": "Lab 3: Explore logs and metrics explorer",
+            "title": "Lab 3: Explore Python, JavaScript and Go Clients",
             "type": "freetier",
-            "filename": "../../lab3/lab3.md"
+            "filename": "../../explore-clients/explore-clients.md"
         },
         {
-            "title": "Lab 4: Simulate a patch scenario",
+            "title": "Lab 4: Gain Insight using Open Tracing",
             "type": "freetier",
-            "filename": "../../lab4/lab4.md"
+            "filename": "../../open-tracing/open-tracing.md"
         },
 		{
-            "title": "Lab 5: Modify Helidon application for Object Storage integration",
+            "title": "Lab 5: Work with Persistence",
             "type": "freetier",
-            "filename": "../../lab5/lab5.md"
+            "filename": "../../persistence/persistence.md"
         },
 		{
-            "title": "Lab 6: Clean up the OCI Resources (Optional)",
+            "title": "Lab 6: Explore the Application Code",
             "type": "freetier",
-            "filename": "../../lab6/lab6.md"
+            "filename": "../../explore-code/explore-code.md"
         },
       {
         "title": "Need Help?",

@@ -23,11 +23,11 @@ In this lab, you will:
 
 ## Task 1: Open the code in the "Files" application
 
-1. In the remote session, choose `Activities` and select the `Files` icon to open the "Files" application.
+1. In the remote session, choose **`Activities`** and select the **`Files`** icon to open the **"Files"** application.
      
    ![Files](images/files.png "Files")
         
-2. Double click `coherence-demo` to change to that directory.
+2. Double click **`coherence-demo`** to change to that directory.
 
    ![Directory](images/directory.png "Directory")
 
@@ -60,21 +60,21 @@ direct GitHub links.
     
 ## Task 3: Explore the Python Code
 
-The Python code is available in the following location:
+The **Python** code is available in the following location:
   
 * clients/py/main.py
 * [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
 
 ## Task 4: Explore the Javascript Code
 
-The JavaScript code is available in the following location:
+The **JavaScript** code is available in the following location:
   
 * clients/js/main.js
 * [main.js](https://github.com/coherence-community/coherence-demo/blob/1412/clients/js/main.js)                       
 
 ## Task 5: Explore the Go Code
 
-The Go code is available in the following location:
+The **Go code** is available in the following location:
   
 * clients/go/main.go
 * [main.go](https://github.com/coherence-community/coherence-demo/blob/1412/clients/go/main.go)                       

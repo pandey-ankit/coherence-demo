@@ -25,28 +25,28 @@ In this lab, you will:
 
 ## Task 1: Create a Snapshot
  
-1. Switch to the primary cluster dashboard and use `Persistence` -> `Create Snapshot` to create a snapshot of the current cache data.
+1. Switch to the primary cluster dashboard and use **`Persistence`** -> **`Create Snapshot`** to create a snapshot of the current cache data.
    Wait for confirmation that the snapshot has been created before continuing.  Note the count of the `Positions`.
 
-   ![Create Snapshot](images/create-snapshot.png "Create Snapshot")
+      ![Create Snapshot](images/create-snapshot.png "Create Snapshot")
 
-   > Note: Coherence will ensure that the data in the snapshot is consistent.
+      > Note: Coherence will ensure that the data in the snapshot is consistent.
 
 ## Task 2: Clear the primary data
 
-1. Use `Tools` -> `Clear Cache` to remove the cache data from the primary cluster. As we have federation configured, this will be replicated to the secondary cluster.
+1. Use **`Tools`** -> **`Clear Cache`** to remove the cache data from the primary cluster. As we have federation configured, this will be replicated to the secondary cluster.
 
    ![Clear Cache](images/clear-cache.png "Clear Cache")
 
-   > Note: Confirm that the data has also been removed from the secondary cluster.
+      > Note: Confirm that the data has also been removed from the secondary cluster.
 
 ## Task 3: Recover the Snapshot
 
-1. Switch to the primary cluster dashboard and use `Persistence` -> `Recover Snapshot` to recover the snapshot data.
+1. Switch to the primary cluster dashboard and use **`Persistence`** -> **`Recover Snapshot`** to recover the snapshot data.
      
    Once the data has been recovered, you will see the updated data in the dashboard.
 
-2. To ensure that the secondary cluster is updated after recovering a snapshot, you need to re-enable federation by selecting `Federation` -> 'Replicate All`.'
+2. To ensure that the secondary cluster is updated after recovering a snapshot, you need to re-enable federation by selecting **`Federation`** -> **'Replicate All`**.
 
    Confirm that the secondary cluster data has also been updated.            
 
