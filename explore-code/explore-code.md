@@ -343,52 +343,102 @@ In this lab, you will:
         The above code creates positions for a single symbol, or if `symbol` is null for random symbols.
         It utilizes a more efficient `putAll` of a `Map` to quickly add the number of positions required.
 
+3. Other Classes
 
-   
+    There are various other components to the Java based JAX-RS application. You can explore the various classes and packages below via the explorer or via the direct GitHub links.
+
+    * ChartDataResource.java in `src/main/java/com/oracle/coherence/demo/application` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)
       
- 
+      This class contains a JAX-RS endpoint that is called from the HTML/ JavaScript application, that will do aggregation, get prices and invoke code across all 
+      members, to determine the number of Trades each member has. Some relevant code below is:
+
+      ```java
+      @GET
+      @Path("{updatePrices}")
+      @Produces( {APPLICATION_JSON, APPLICATION_XML, TEXT_PLAIN})
+      public Response getChartData(@PathParam("updatePrices") boolean updatePrices) {
+          ...
+          // retrieve the trade summary using a custom aggregator across the members
+          Map<String, TradeSummary> mapTradesBySymbol = trades.aggregate(GroupAggregator.createInstance(Trade::getSymbol,
+                new TradeSummaryAggregator()));   
+         
+          InvocationService invocationService = (InvocationService) CacheFactory.getService("InvocationService");
+
+          // determine the storage enabled members for the membership query
+          Set<Member> storageEnabledMembers =
+                 ((DistributedCacheService) trades.getCacheService()).getOwnershipEnabledMembers();
+          
+           // determine the member information
+          Map<Member, MemberInfo> memberInfoMap =
+                invocationService.query(new GetMemberInfo(trades.getCacheName()), storageEnabledMembers);
+
+          // establish the chart data
+          ChartData data = new ChartData(CacheFactory.getCluster().getTimeMillis(),
+                mapTradesBySymbol,
+                symbolPrice,
+                memberInfoMap.values(),
+                stopWatch.getElapsedTimeIn(TimeUnit.MILLISECONDS));
+      }
+      ```
    
+   * EventsResource.java in `src/main/java/com/oracle/coherence/demo/application` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)
+      
+     This class contains methods to set up a Server Sent Events (SSE) broadcaster and uses Coherence Map Events to send any changes to the SSE channel.
+     Some relevant methods are shown below:
+   
+     ```java
+     @PostConstruct
+     void createBroadcaster() {
+        this.broadcaster = sse.newBroadcaster();
+        this.prices = Utilities.getPricesCache();
+                   
+        // add a MapListener on the Price cache on startup to push event changes to the event broadcaster
+        prices.addMapListener(new SimpleMapListener<String, Price>()
+                .addUpdateHandler(e->broadcaster.broadcast(createEvent("priceUpdate",
+                        e.getNewValue().getSymbol(), e.getOldValue().getPrice(), e.getNewValue().getPrice()))));
+     }
 
-There are various components to the Java based JAX-RS application. You can explore the various classes and packages below via the explorer or via the 
-direct GitHub links.
+     private OutboundSseEvent createEvent(String name, String symbol, double oldPrice, double newPrice) {
+        return sse.newEventBuilder()
+                  .name(name)
+                  .data(Price.class, new PriceUpdate(symbol, oldPrice, newPrice))
+                  .mediaType(APPLICATION_JSON_TYPE)
+                  .build();
+     }
 
-> Note: Not all source or configuration files are displayed, just some that showcase important components.
+     /**
+      * Registers an event listener for the specified {@link SseEventSink}.
+      *
+      * @param eventSink  provided {@link SseEventSink}
+      */
+     @GET
+     @Path("subscribe")
+     @Produces(MediaType.SERVER_SENT_EVENTS)
+     public void registerEventListener(@Context SseEventSink eventSink) {
+         broadcaster.register(eventSink);
+         eventSink.send(sse.newEvent("begin", new Date().toString()));
+     }
+     ``` 
 
-**Source Files**
+## Task 3: Explore the Application HTML and JavaScript
 
-| Package                                             | Class                     | Usage                                         | GitHub Link                                                                                                                                                                |
-|-----------------------------------------------------|---------------------------|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| src/main/java/com/oracle/coherence/demo/application | BootstrapInterceptor.java | Code executed on startup                      | [BootstrapInterceptor.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/BootstrapInterceptor.java) |
-| src/main/java/com/oracle/coherence/demo/application | ChartDataResource.java    | JAX-RS Endpoint to carry out data aggregation | [ChartDataResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)       |
-| src/main/java/com/oracle/coherence/demo/application | EventsResource.java       | JAX-RS Endpoint to listen for events          | [EventsResource.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)             |
-| src/main/java/com/oracle/coherence/demo/application | Utilities.java            | Various utilities for working with cache data | [Utilities.java](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Utilities.java)                       |
-| src/main/java/com/oracle/coherence/demo/cachestore  |                           | Contains cache store JPA Code                 | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/cachestore)                                                 |
-| src/main/java/com/oracle/coherence/demo/model       |                           | Contains cache model classes                  | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/java/com/oracle/coherence/demo/model)                                                      |
-
-**Configuration Files**  
- 
-| File                                             | Usage                                        | Usage                                                       | GitHub Link                                                                                                                                                     |
-|--------------------------------------------------|----------------------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| src/main/resources/cache-config-grid-edition.xml | cache-config-grid-edition.xml                | Contains cache config for federation scheme and cache store | [cache-config-grid-edition.xml](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/resources/cache-config-grid-edition.xml)               |
-| src/main/resources/cache-config-grid-edition.xml | tangosol-coherence-override-grid-edition.xml | Contains override config for federation setup               | [ache-config-grid-edition.xml](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/resources/tangosol-coherence-override-grid-edition.xml) |
-| src/main/resources/web                           | HTML and JavaScript for web application      |                                                             | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/resources/web)                                                                  |
-
-    
-## Task 3: Explore the Python Code
+1. Step 1
+  
+## Task 4: Explore the Python Code
 
 The **Python** code is available in the following location:
   
 * clients/py/main.py
 * [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
 
-## Task 4: Explore the Javascript Code
+## Task 5: Explore the Javascript Code
 
 The **JavaScript** code is available in the following location:
   
 * clients/js/main.js
 * [main.js](https://github.com/coherence-community/coherence-demo/blob/1412/clients/js/main.js)                       
 
-## Task 5: Explore the Go Code
+## Task 6: Explore the Go Code
 
 The **Go code** is available in the following location:
   
