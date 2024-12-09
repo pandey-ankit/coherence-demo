@@ -41,7 +41,7 @@ In this lab, you will:
    
 ## Task 2: Configure Tracing on the Primary Cluster
   
-1. Access the primary cluster console and choose **`Tools`** -> **`Configure Tracing`**.
+1. Access the primary cluster console and choose **`Tools`** -> **`Configure Tracing`**, and then choose **`Enable Tracing for Cluster`**.
 
    ![Enable Tracing](images/enable-tracing.png "Enable Tracing")
       

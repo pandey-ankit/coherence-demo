@@ -25,7 +25,7 @@ In this lab, you will:
 
 > *Note: Ensure you have disabled price updates before continuing*.
 
-1. From the **`Federation`** menu, select **`Start Federation`**. After a short time you should see “Data sent to remote cluster..” and a cluster name appearing at the top as show here. The cluster name is chose based upon your region location.
+1. From the **`Federation`** menu, select **`Start Federation`**. After a short time you should see “Data sent to remote cluster..” and a cluster name appearing at the top as show here. The cluster name is chosen based upon your region location.
    ![Federation Start](images/federation-header.png "Federation Start")
       > If you have **"Insight"** enabled, a dialog will be displayed showing how federation is setup in configuration only. No actual application code changes are required.
 
