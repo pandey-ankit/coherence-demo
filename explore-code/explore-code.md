@@ -127,12 +127,7 @@ In this lab, you will:
                 </read-write-backing-map-scheme>
               </backing-map-scheme>
               <autostart>true</autostart>
-              <address-provider>
-                <local-address>
-                  <address system-property="coherence.extend.address"></address>
-                  <port system-property="coherence.federation.port">40000</port>
-                </local-address>
-              </address-provider>
+              ...
               <topologies>
                 <topology>
                    <name>Active</name>
@@ -150,7 +145,7 @@ In this lab, you will:
       or `src/main/resources/tangosol-coherence-override-grid-edition.xml`.
 
       ```xml
-       <federation-config>
+      <federation-config>
           <participants>   <!-- defines each participant or cluster in the federation setup -->
             <participant>
               <name system-property="primary.cluster">PrimaryCluster</name>
@@ -257,7 +252,100 @@ In this lab, you will:
       }
       ```     
 
-2. Bootstrap Interceptor
+2. Bootstrap Interceptor and Utilities classes
+
+   Available at `src/main/java/com/oracle/coherence/demo/application/BootstrapInterceptor.java` or on [GitHub](src/main/java/com/oracle/coherence/demo/application/BootstrapInterceptor.java).
+   This class contains code run at startup of the cluster member to determine if it should load the initial data, and then opens the main dashboard. The main part of this code runs the following:
+           
+      ```java
+      if (loadData) {
+          Utilities.addIndexes();
+          Utilities.populatePrices();
+          Utilities.createPositions();
+      }
+      ```      
+   
+   The `Utilities` class available at `src/main/java/com/oracle/coherence/demo/application/Utilities.java` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Utilities.java)
+   has various methods that the application calls. We have included some relevant snippets below, which extra tracing code removed, for viewing.
+                      
+      * addIndexes()
+   
+        ```java
+        public static void addIndexes() {
+            NamedCache<String, Trade> tradesCache = getTradesCache();
+ 
+            tradesCache.addIndex(Trade::getSymbol, true, null);
+            tradesCache.addIndex(Trade::getPurchaseValue, false, null);
+            tradesCache.addIndex(Trade::getQuantity, false, null);
+            
+            System.out.println(" Done");
+        }
+        ``` 
+        
+        The above code adds three indexes using value extractors, such as `Trade::getSymbol`, which extract the specified method value
+        and store a deserialized version of this for fast access when issuing queries and aggregations.
+
+      * populatePrices()
+   
+        ```java
+        public static void populatePrices() {
+            NamedCache<String, Price> pricesCaches = getPricesCache();
+            for (String symbol : SYMBOLS) {
+                Price price = new Price(symbol, INITIAL_PRICE);
+                pricesCaches.put(price.getSymbol(), price);
+            }
+        }
+        ``` 
+        
+        The above code loops through the `SYMBOLS`, which is an array of stock symbols, and inserts initial proces.
+
+      * createPositions() , which calls `createPositions(null, NR_POSITIONS_TO_CREATE)`
+   
+        ```java
+        public static void createPositions(String symbolToInsert, int count) {
+            Logger.out(String.format("Creating %d Positions...", count));
+
+            NamedCache<String, Trade> tradesCache = getTradesCache();
+            NamedCache<String, Price> priceCache  = getPricesCache();
+
+            boolean singleSymbol = symbolToInsert != null;
+
+            Map<String, Price>     localPrices = new HashMap<>(priceCache.getAll(priceCache.keySet()));
+            HashMap<String, Trade> trades      = new HashMap<>();
+            Random                 random      = ThreadLocalRandom.current();
+
+            for (int i = 0; i < count; i++) {
+                // create a random position
+                String symbol = singleSymbol ? symbolToInsert : SYMBOLS[random.nextInt(SYMBOLS.length)];
+                int    amount = random.nextInt(1000) + 1;
+                double price  = localPrices.get(symbol).getPrice();
+
+                Trade trade = new Trade(symbol, amount, price);
+
+                trades.put(trade.getId(), trade);
+
+                // batch the putAll's at 100,000
+                if (i % 100_000 == 0) {
+                    Logger.out("Flushing trades from HashMap to Coherence cache...");
+                    tradesCache.putAll(trades);
+                    trades.clear();
+                }
+            }
+
+            // insert any remaining trades not previously flushed
+            if (!trades.isEmpty()) {
+                tradesCache.putAll(trades);
+            } 
+            Logger.out(String.format("Creation Complete! (Cache contains %d positions) ", tradesCache.size()));
+        }
+        ``` 
+        
+        The above code creates positions for a single symbol, or if `symbol` is null for random symbols.
+        It utilizes a more efficient `putAll` of a `Map` to quickly add the number of positions required.
+
+
+   
+      
  
    
 
