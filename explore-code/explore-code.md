@@ -433,25 +433,27 @@ The main components are highlight below:
 
   
 ## Task 4: Explore the Python Code
+               
+1. Code and Serialization
 
-The **Python** code is available in the following location:
+   The **Python** code is available in the following location:
   
-* clients/py/main.py
-* [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
+   * clients/py/main.py
+   * [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
 
-For all the clients, by default, data is serialized into JSON and storage as native JSON objects in the cluster. 
-in this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, 
-but at a high level we set an attribute `@class` in the client data structure and this maps to the 
-server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
+   For all the clients, by default, data is serialized into JSON and storage as native JSON objects in the cluster. 
+   in this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, 
+   but at a high level we set an attribute `@class` in the client data structure and this maps to the 
+   server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
 
-```bash
-Trade=com.oracle.coherence.demo.model.Trade
-Price=com.oracle.coherence.demo.model.Price```
-```
+   ```bash
+   Trade=com.oracle.coherence.demo.model.Trade
+   Price=com.oracle.coherence.demo.model.Price```
+   ```
 
-> Note: If you are using the one client to access data, you do not have to have a Java representation.
+   > Note: If you are using the one client to access data, you do not have to have a Java representation.
 
-A few of the main areas of code have been included below:
+   A few of the main areas of code have been included below:
 
 1. Define the domain classes
 
