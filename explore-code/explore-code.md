@@ -37,28 +37,28 @@ In this lab, you will:
 
    The application is started using the following command:
 
-   ```bash
-   mvn -P grid-edition exec:exec
-   ```
+      ```bash
+      mvn -P grid-edition exec:exec
+      ```
 
-   This starts the application using the exec-maven-plugin which sets the following arguments in the project in [pom.xml](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/pom.xml#L351):
+      This starts the application using the exec-maven-plugin which sets the following arguments in the project in [pom.xml](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/pom.xml#L351):
  
-   | Argument                                            | Usage                                                                                 |
-   |-----------------------------------------------------|---------------------------------------------------------------------------------------|
-   | -Dcoherence.log.level=7                             | Set the Coherence log level to 7 to provide more verbose output that the default of 5 |
-   | -Dcoherence.management=all                          | Enables management for the cluster                                                    |
-   | -Dcoherence.wka=127.0.0.1                           | Scopes the cluster to the localhost only                                              |
-   | -Dcoherence.ttl=0                                   | Ensures cluster traffic does not go outside this VM                                   |
-   | -Dcoherence.grpc.server.port=1408                   | Enable the gRPC Proxy on port 1408                                                    |
-   | -Dcoherence.metrics.http.enabled=${metrics.enabled} | If set to true, enabled Coherence metrics, see the                                    |
+      | Argument                                            | Usage                                                                                 |
+      |-----------------------------------------------------|---------------------------------------------------------------------------------------|
+      | -Dcoherence.log.level=7                             | Set the Coherence log level to 7 to provide more verbose output that the default of 5 |
+      | -Dcoherence.management=all                          | Enables management for the cluster                                                    |
+      | -Dcoherence.wka=127.0.0.1                           | Scopes the cluster to the localhost only                                              |
+      | -Dcoherence.ttl=0                                   | Ensures cluster traffic does not go outside this VM                                   |
+      | -Dcoherence.grpc.server.port=1408                   | Enable the gRPC Proxy on port 1408                                                    |
+      | -Dcoherence.metrics.http.enabled=${metrics.enabled} | If set to true, enabled Coherence metrics, see the                                    |
                                                                                                                                                      
    The startup class is [com.oracle.coherence.demo.application.Launcher](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Launcher.java) which does the following:
    
-   1. Determines the time zone and sets sensible primary and secondary cluster names as system properties, as well as Jaegar endpoint
-   2. Sets the following system property which indicates the cache configuration file to load.
+      * Determines the time zone and sets sensible primary and secondary cluster names as system properties, as well as Jaegar endpoint
+      * Sets the following system property which indicates the cache configuration file to load.
 
-      `System.setProperty("coherence.cacheconfig", "cache-config.xml")`
-   3. Calls Coherence.main(args) which is the main entry point for coherence.
+         `System.setProperty("coherence.cacheconfig", "cache-config.xml")`
+      * Calls Coherence.main(args) which is the main entry point for coherence.
 
  
 2. Configuration Files
@@ -256,6 +256,10 @@ In this lab, you will:
           ...
       }
       ```     
+
+2. Bootstrap Interceptor
+ 
+   
 
 There are various components to the Java based JAX-RS application. You can explore the various classes and packages below via the explorer or via the 
 direct GitHub links.
