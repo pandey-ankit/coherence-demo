@@ -76,7 +76,7 @@ In this lab, you will:
          <interceptors>
            <interceptor>
              <instance>
-                <class-name>com.oracle.coherence.demo.application.BootstrapInterceptor</class-name>
+               <class-name>com.oracle.coherence.demo.application.BootstrapInterceptor</class-name>
              </instance>
            </interceptor>
          </interceptors>
@@ -438,601 +438,600 @@ The main components are highlight below:
 
    The **Python** code is available in the following location:
   
-   * clients/py/main.py
-   * [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
+   **clients/py/main.py**</br>
+   **[main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)**
 
    For all the clients, by default, data is serialized into JSON and storage as native JSON objects in the cluster. 
-   in this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, 
-   but at a high level we set an attribute `@class` in the client data structure and this maps to the 
-   server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
+   In this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, but at a high level we set an attribute `@class` in the client data structure and this maps to the server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
 
-   ```bash
-   Trade=com.oracle.coherence.demo.model.Trade
-   Price=com.oracle.coherence.demo.model.Price```
-   ```
+      ```bash
+      Trade=com.oracle.coherence.demo.model.Trade
+      Price=com.oracle.coherence.demo.model.Price
+      ```
 
    If you are using the one client to access data, you do not have to have a Java representation.
 
    A few of the main areas of code have been included below:
 
-2. Define the domain classes
+   **Define the domain classes**
 
    The `@serialization.proxy("Price")` defines the Java class that this object will serialize to.
 
-   ```python
-   @dataclass
-   @serialization.proxy("Price")
-   class Price:
-       symbol: str
-       price: float
+      ```python
+      @dataclass
+      @serialization.proxy("Price")
+      class Price:
+         symbol: str
+         price: float
 
-   @dataclass
-   @serialization.proxy("Trade")
-   class Trade:
-       id: str
-       symbol: str
-       quantity: int
-       price: float
+      @dataclass
+      @serialization.proxy("Trade")
+      class Trade:
+         id: str
+         symbol: str
+         quantity: int
+         price: float
 
-   session: Session
-   prices: NamedCache[str, Price]
-   trades: NamedCache[str, Trade]
-   ``` 
+      session: Session
+      prices: NamedCache[str, Price]
+      trades: NamedCache[str, Trade]
+      ``` 
    
-3. Connect to the Coherence cluster and setup caches
+   **Connect to the Coherence cluster and setup caches**
    
-   ```python
-   async def init_coherence() -> None:
-       """
-       Initialize Coherence.
+      ```python
+      async def init_coherence() -> None:
+         """
+         Initialize Coherence.
 
-       :return: None
-       """
-       global session
-       global prices
-       global trades
-                                          
-       # Uses default of localhost:1408
-       session = await Session.create()   
-       prices = await session.get_cache("Price")
-       trades = await session.get_cache("Trade")
-   ```
-4. Display the cache size
+         :return: None
+         """
+         global session
+         global prices
+         global trades
+                                             
+         # Uses default of localhost:1408
+         session = await Session.create()   
+         prices = await session.get_cache("Price")
+         trades = await session.get_cache("Trade")
+      ```
+   **Display the cache size**
     
-   ```python
-   async def display_cache_size() -> None:
-       """
-       Displays the size for both the Trade and Price caches.
+      ```python
+      async def display_cache_size() -> None:
+         """
+         Displays the size for both the Trade and Price caches.
 
-       :return: None
-       """
-       global prices
-       global trades
+         :return: None
+         """
+         global prices
+         global trades
 
-       tradesize = await trades.size()
-       pricesize = await prices.size()
+         tradesize = await trades.size()
+         pricesize = await prices.size()
 
-       print(f"Trade cache size: {tradesize}")
-       print(f"Price cache size: {pricesize}")
-   ```
+         print(f"Trade cache size: {tradesize}")
+         print(f"Price cache size: {pricesize}")
+      ```
 
-5. Monitor prices
+   **Monitor prices**
 
-   ```python
-   async def monitor_prices() -> None:
-       """
-       Monitors the Price cache for any changes and displays them.
+      ```python
+      async def monitor_prices() -> None:
+         """
+         Monitors the Price cache for any changes and displays them.
+      
+         :return: None
+         """
+         global prices
+      
+         listener: MapListener[str, Price] = MapListener()
+         listener.on_updated(lambda e: handle_event(e))
+         await prices.add_map_listener(listener)
+      
+         print("Listening for price changes. Press CTRL-C to finish.")
+         await asyncio.sleep(10000)
+      
+      def handle_event(e) -> None:
+         """
+         Event handler to display the event details
+      
+         :return: None
+         """
+         symbol = e.key
+         old_price = e.old.price
+         new_price = e.new.price
+         change = new_price - old_price
+      
+         print(
+               f"Price changed for {symbol}, new=${new_price:.2f}, old=${old_price:.2f}, change=${change:.2f}")
+      ```
     
-       :return: None
-       """
-       global prices
-    
-       listener: MapListener[str, Price] = MapListener()
-       listener.on_updated(lambda e: handle_event(e))
-       await prices.add_map_listener(listener)
-    
-       print("Listening for price changes. Press CTRL-C to finish.")
-       await asyncio.sleep(10000)
-     
-   def handle_event(e) -> None:
-       """
-       Event handler to display the event details
-    
-       :return: None
-       """
-       symbol = e.key
-       old_price = e.old.price
-       new_price = e.new.price
-       change = new_price - old_price
-    
-       print(
-            f"Price changed for {symbol}, new=${new_price:.2f}, old=${old_price:.2f}, change=${change:.2f}")
-   ```
-    
-6. Add trades
+   **Add trades**
 
-   ```python 
-   async def add_trades(symbol: str, count: int) -> None:
-    """
-    Add trades for a symbol.
+      ```python 
+      async def add_trades(symbol: str, count: int) -> None:
+      """
+      Add trades for a symbol.
 
-    :param symbol the symbol to add trades to
-    :param count the number of trades to add
-    :return: None
-    """
-    global prices
-    global trades
+      :param symbol the symbol to add trades to
+      :param count the number of trades to add
+      :return: None
+      """
+      global prices
+      global trades
 
-    if count <= 0:
-        print("count must be supplied and be positive")
-        return
-                  
-    # Return a list of the valid symbols from Coherence
-    symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
+      if count <= 0:
+         print("count must be supplied and be positive")
+         return
+                     
+      # Return a list of the valid symbols from Coherence
+      symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
 
-    if symbol in symbols:
-        current_price: Price = await prices.get(symbol)
+      if symbol in symbols:
+         current_price: Price = await prices.get(symbol)
 
-        buffer: dict[str, Trade] = {}
-        print()
+         buffer: dict[str, Trade] = {}
+         print()
 
-        print(f"{get_time()}: Adding {count} random trades for {symbol}")
+         print(f"{get_time()}: Adding {count} random trades for {symbol}")
 
-        for i in range(0, count):
-            trade_id = str(uuid.uuid1())
-            new_trade: Trade = Trade(trade_id, symbol, random.randint(1, 1000), current_price.price)
-            buffer[trade_id] = new_trade
-            if i % 1000 == 0:
-                await trades.put_all(buffer)
-                buffer.clear()
+         for i in range(0, count):
+               trade_id = str(uuid.uuid1())
+               new_trade: Trade = Trade(trade_id, symbol, random.randint(1, 1000), current_price.price)
+               buffer[trade_id] = new_trade
+               if i % 1000 == 0:
+                  await trades.put_all(buffer)
+                  buffer.clear()
 
-        # Write anything left
-        if len(buffer) != 0:
-            await trades.put_all(buffer)
+         # Write anything left
+         if len(buffer) != 0:
+               await trades.put_all(buffer)
 
-        size = await trades.size()
-        print(f"{get_time()}: Size of Trade cache is now {size}")
-    else:
-        print(f"Unable to find {symbol}, valid symbols are {symbols}")
-    ```
+         size = await trades.size()
+         print(f"{get_time()}: Size of Trade cache is now {size}")
+      else:
+         print(f"Unable to find {symbol}, valid symbols are {symbols}")
+      ```
 
-7. Stock split
+   **Stock split**
 
-   ```python 
-   async def stock_split(symbol: str, factor: int) -> None:
-    """
-    Do a stock split.
+      ```python 
+      async def stock_split(symbol: str, factor: int) -> None:
+      """
+      Do a stock split.
 
-    :param symbol the symbol to split
-    :param factor the factor to use for the split, e.g. 2 = 2 to 1
-    :return: None
-    """
-    global prices
-    global trades
+      :param symbol the symbol to split
+      :param factor the factor to use for the split, e.g. 2 = 2 to 1
+      :return: None
+      """
+      global prices
+      global trades
 
-    if factor <= 0 or factor > 10:
-        print("factor must be supplied and be positive and less than 10")
-        return
+      if factor <= 0 or factor > 10:
+         print("factor must be supplied and be positive and less than 10")
+         return
 
-    symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
+      symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
 
-    if symbol in symbols:
-        current_price: Price = await prices.get(symbol)
+      if symbol in symbols:
+         current_price: Price = await prices.get(symbol)
 
-        # the process for the stock split is:
-        # 1. Update each trade and multiply the quantity by thr factor
-        # 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
-        # 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
+         # the process for the stock split is:
+         # 1. Update each trade and multiply the quantity by thr factor
+         # 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
+         # 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
 
-        print()
-        print(f"{get_time()}: Splitting {symbol} using factor of {factor}")
+         print()
+         print(f"{get_time()}: Splitting {symbol} using factor of {factor}")
 
-        print(f"{get_time()}: Update quantity for {symbol}")
-        async for _ in trades.invoke_all(Processors.multiply("quantity", factor), None, Filters.equals("symbol", symbol)):
-            break  # ignore
+         print(f"{get_time()}: Update quantity for {symbol}")
+         async for _ in trades.invoke_all(Processors.multiply("quantity", factor), None, Filters.equals("symbol", symbol)):
+               break  # ignore
 
-        print(f"{get_time()}: Update price for {symbol}")
-        async for _ in trades.invoke_all(Processors.multiply("price", 1 / factor), None, Filters.equals("symbol", symbol)):
-            break  # ignore
+         print(f"{get_time()}: Update price for {symbol}")
+         async for _ in trades.invoke_all(Processors.multiply("price", 1 / factor), None, Filters.equals("symbol", symbol)):
+               break  # ignore
 
-        await prices.invoke(symbol, Processors.multiply("price", 1 / factor))
+         await prices.invoke(symbol, Processors.multiply("price", 1 / factor))
 
-        new_price = (current_price.price / factor)
+         new_price = (current_price.price / factor)
 
-        print(f"{get_time()}: Updating price for {symbol} to ${new_price:.2f}")
-    else:
-        print(f"Unable to find {symbol}, valid symbols are {symbols}")
-    ```
+         print(f"{get_time()}: Updating price for {symbol} to ${new_price:.2f}")
+      else:
+         print(f"Unable to find {symbol}, valid symbols are {symbols}")
+      ```
 
 ## Task 5: Explore the Javascript Code
 
 The **JavaScript** code is available in the following location:
   
-* clients/js/main.js
-* [main.js](https://github.com/coherence-community/coherence-demo/blob/1412/clients/js/main.js)       
+   **clients/js/main.js**</br>
+   **[main.js](https://github.com/coherence-community/coherence-demo/blob/1412/clients/js/main.js)**       
     
 1. Define the domain classes
-   ```javascript
-   // create a Trade
-   function createTrade(symbol, qty, price) {
-       const trade = {
-           '@class': 'Trade',
-           id: uuid.v4().toString(),
-           symbol: symbol,
-           quantity: qty,
-           price: price
-       }
+      ```javascript
+      // create a Trade
+      function createTrade(symbol, qty, price) {
+         const trade = {
+            '@class': 'Trade',
+            id: uuid.v4().toString(),
+            symbol: symbol,
+            quantity: qty,
+            price: price
+         }
 
-       return trade
-   }
-   ```
+         return trade
+      }
+      ```
 
    No actual classes / objects are required in JavaScript, as you can work directly with JSON.   
 
 2. Connect to the Coherence cluster and setup caches
 
-   ```javascript
-   // setup session to Coherence
-   const session = new Session()
-   const prices = session.getCache('Price')
-   const trades = session.getCache('Trade')
-   ```
+      ```javascript
+      // setup session to Coherence
+      const session = new Session()
+      const prices = session.getCache('Price')
+      const trades = session.getCache('Trade')
+      ```
 
 3. Display the cache size
 
-   ```javascript
-   if (command === "size") {
-    console.log("Trade cache size = " + (await trades.size))
-    console.log("Price cache size = " + (await prices.size))
-   ```
+      ```javascript
+      if (command === "size") {
+      console.log("Trade cache size = " + (await trades.size))
+      console.log("Price cache size = " + (await prices.size))
+      ```
  
 4. Monitor prices
 
-   ```javascript
-   // monitor any price changes
-   async function monitor() {
-       console.log("Listening for price changes. Press CTRL-C to finish.")
-       const handler = (event) => {
-           let oldPrice = event.oldValue.price;
-           let newPrice = event.newValue.price;
-           let change = newPrice - oldPrice;
-    
-           console.log("Price changed for " + event.key + ", new=" + formatter.format(newPrice) +
-               ", old=" + formatter.format(oldPrice) + ", change=" + formatter.format(change))
-       }
-       const listener = new MapListener().on(MapEventType.UPDATE, handler)
-    
-       await prices.addMapListener(listener)
-       await sleep(100_000_000)
-    }
+      ```javascript
+      // monitor any price changes
+      async function monitor() {
+         console.log("Listening for price changes. Press CTRL-C to finish.")
+         const handler = (event) => {
+            let oldPrice = event.oldValue.price;
+            let newPrice = event.newValue.price;
+            let change = newPrice - oldPrice;
+      
+            console.log("Price changed for " + event.key + ", new=" + formatter.format(newPrice) +
+                  ", old=" + formatter.format(oldPrice) + ", change=" + formatter.format(change))
+         }
+         const listener = new MapListener().on(MapEventType.UPDATE, handler)
+      
+         await prices.addMapListener(listener)
+         await sleep(100_000_000)
+      }
    ```
 
 5. Add trades
 
-   ```javascript
-   // add a number of trades for a symbol
-   async function addTrades(symbol, count) {
-       if (count < 0) {
-           console.log("Count must not be negative")
-           return
-       }
-       
-       // get the distinct list of symbols
-       let symbols = await prices.aggregate(Aggregators.distinct('symbol'))
-    
-      if (!symbols.includes(symbol, 0)) {
-           console.log("Unable to find " + symbol + ", valid values are " + symbols)
-           return
-       }
-    
-       console.log(new Date().toISOString() + ": Adding %d random trades for %s...", count, symbol)
-    
-       // get the current price for the trade
-       let currentPrice = await prices.get(symbol)
-                     
-       // use efficient setAll (equivalent of putAll)
-       let buffer = new Map()
-       for (let i = 0; i < count; i++) {
-           let trade = createTrade(symbol, Math.floor(Math.random() * 1000), currentPrice.price)
-           buffer.set(trade.id, trade)
-           if (i % 1000 === 0) {
-               await trades.setAll(buffer)
-               buffer.clear()
-           }
-       }
-        
-       if (buffer.size !== 0) {
-           await trades.setAll(buffer)
-       }
-    
-       let size = await trades.size
-       console.log(new Date().toISOString() + ": Trades cache size is now " + size)
-    }
-   ```
+      ```javascript
+      // add a number of trades for a symbol
+      async function addTrades(symbol, count) {
+         if (count < 0) {
+            console.log("Count must not be negative")
+            return
+         }
+         
+         // get the distinct list of symbols
+         let symbols = await prices.aggregate(Aggregators.distinct('symbol'))
+      
+         if (!symbols.includes(symbol, 0)) {
+            console.log("Unable to find " + symbol + ", valid values are " + symbols)
+            return
+         }
+      
+         console.log(new Date().toISOString() + ": Adding %d random trades for %s...", count, symbol)
+      
+         // get the current price for the trade
+         let currentPrice = await prices.get(symbol)
+                        
+         // use efficient setAll (equivalent of putAll)
+         let buffer = new Map()
+         for (let i = 0; i < count; i++) {
+            let trade = createTrade(symbol, Math.floor(Math.random() * 1000), currentPrice.price)
+            buffer.set(trade.id, trade)
+            if (i % 1000 === 0) {
+                  await trades.setAll(buffer)
+                  buffer.clear()
+            }
+         }
+         
+         if (buffer.size !== 0) {
+            await trades.setAll(buffer)
+         }
+      
+         let size = await trades.size
+         console.log(new Date().toISOString() + ": Trades cache size is now " + size)
+      }
+      ```
 
 6. Stock split
 
-   ```javascript
-   // split a stock using a given factor
-   async function stockSplit(symbol, factor) {
-       if (factor < 0) {
-           console.log("Factor must not be negative")
-           return
-       }
-    
-       let symbols = await prices.aggregate(Aggregators.distinct('symbol'))
-    
-       if (!symbols.includes(symbol, 0)) {
-           console.log("Unable to find " + symbol + ", valid values are " + symbols)
+      ```javascript
+      // split a stock using a given factor
+      async function stockSplit(symbol, factor) {
+         if (factor < 0) {
+            console.log("Factor must not be negative")
             return
-       }
-    
-       console.log(new Date().toISOString() + ": Splitting %s using factor of %d...", symbol, factor)
-    
-       // get the current price for the trade
-       let currentPrice = await prices.get(symbol)
-    
-       // the process for the stock split is:
-       // 1. Update each trade and multiply the quantity by thr factor
-       // 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
-       // 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
-    
-       let filter = Filters.equal("symbol", symbol)
-    
-       console.log(new Date().toISOString() + ": Updating quantity for " + symbol + " trades...")
-       await trades.invokeAll(filter, Processors.multiply("quantity", factor))
-    
-       console.log(new Date().toISOString() + ": Updating price for " + symbol + " trades...")
-       await trades.invokeAll(filter, Processors.multiply("price", 1 / factor))
-    
-       let newPrice = (currentPrice.price / factor)
-    
-       console.log(new Date().toISOString() + ": Updating price for " + symbol + " to " + formatter.format(newPrice))
-       await prices.invoke(symbol, Processors.multiply("price", 1 / factor))
-   }
-   ```
+         }
+      
+         let symbols = await prices.aggregate(Aggregators.distinct('symbol'))
+      
+         if (!symbols.includes(symbol, 0)) {
+            console.log("Unable to find " + symbol + ", valid values are " + symbols)
+               return
+         }
+      
+         console.log(new Date().toISOString() + ": Splitting %s using factor of %d...", symbol, factor)
+      
+         // get the current price for the trade
+         let currentPrice = await prices.get(symbol)
+      
+         // the process for the stock split is:
+         // 1. Update each trade and multiply the quantity by thr factor
+         // 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
+         // 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
+      
+         let filter = Filters.equal("symbol", symbol)
+      
+         console.log(new Date().toISOString() + ": Updating quantity for " + symbol + " trades...")
+         await trades.invokeAll(filter, Processors.multiply("quantity", factor))
+      
+         console.log(new Date().toISOString() + ": Updating price for " + symbol + " trades...")
+         await trades.invokeAll(filter, Processors.multiply("price", 1 / factor))
+      
+         let newPrice = (currentPrice.price / factor)
+      
+         console.log(new Date().toISOString() + ": Updating price for " + symbol + " to " + formatter.format(newPrice))
+         await prices.invoke(symbol, Processors.multiply("price", 1 / factor))
+      }
+      ```
 
 ## Task 6: Explore the Go Code
 
 The **Go code** is available in the following location:
   
-* clients/go/main.go
-* [main.go](https://github.com/coherence-community/coherence-demo/blob/1412/clients/go/main.go)
+   **clients/go/main.go**</br>
+   **[main.go](https://github.com/coherence-community/coherence-demo/blob/1412/clients/go/main.go)**
 
 1. Define the domain classes
 
-   ```go
-   type Trade struct {
-       Class    string  `json:"@class"`
-       ID       string  `json:"id"`
-       Symbol   string  `json:"symbol"`
-       Quantity int     `json:"quantity"`
-       Price    float32 `json:"price"`
-   }
-    
-   type Price struct {
-       Class  string  `json:"@class"`
-       Symbol string  `json:"symbol"`
-       Price  float32 `json:"price"`
-   }
-   ```
+      ```go
+      type Trade struct {
+         Class    string  `json:"@class"`
+         ID       string  `json:"id"`
+         Symbol   string  `json:"symbol"`
+         Quantity int     `json:"quantity"`
+         Price    float32 `json:"price"`
+      }
+      
+      type Price struct {
+         Class  string  `json:"@class"`
+         Symbol string  `json:"symbol"`
+         Price  float32 `json:"price"`
+      }
+      ```
 
 2. Connect to the Coherence cluster and setup caches
 
-   ```go
-   // create a new Session
-   session, err := coherence.NewSession(ctx, coherence.WithPlainText(), coherence.WithRequestTimeout(time.Duration(120)*time.Second))
-   err != nil {
-      ic(err)
-   }
-   defer session.Close()
+      ```go
+      // create a new Session
+      session, err := coherence.NewSession(ctx, coherence.WithPlainText(), coherence.WithRequestTimeout(time.Duration(120)*time.Second))
+      err != nil {
+         ic(err)
+      }
+      defer session.Close()
 
-   trades, err = coherence.GetNamedCache[string, Trade](session, "Trade")
-   if err != nil {
-   	 panic(err)
-   }
+      trades, err = coherence.GetNamedCache[string, Trade](session, "Trade")
+      if err != nil {
+         panic(err)
+      }
 
-   prices, err = coherence.GetNamedCache[string, Price](session, "Price")
-   if err != nil {
-      panic(err)
-   }
-   ```   
+      prices, err = coherence.GetNamedCache[string, Price](session, "Price")
+      if err != nil {
+         panic(err)
+      }
+      ```   
 
 3. Display the cache size
     
-   ```go
-   func displaySize(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price]) error {
-      size, err := trades.Size(ctx)
-      if err != nil {
-          return err
+      ```go
+      func displaySize(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price]) error {
+         size, err := trades.Size(ctx)
+         if err != nil {
+            return err
+         }
+         fmt.Printf("Trade cache size = %d\n", size)
+         
+         size, err = prices.Size(ctx)
+         if err != nil {
+            return err
+         }
+         fmt.Printf("Price cache size = %d\n\n", size)
+         return nil
       }
-      fmt.Printf("Trade cache size = %d\n", size)
-      
-      size, err = prices.Size(ctx)
-      if err != nil {
-          return err
-      }
-      fmt.Printf("Price cache size = %d\n\n", size)
-      return nil
-    }
-   ```
+      ```
 
 4. Monitor prices
  
-   ```go
-   func listenPrices(prices coherence.NamedCache[string, Price]) error {
-      fmt.Println("Listening for price changes. Press CTRL-C to finish.")
-      fmt.Println()
+      ```go
+      func listenPrices(prices coherence.NamedCache[string, Price]) error {
+         fmt.Println("Listening for price changes. Press CTRL-C to finish.")
+         fmt.Println()
 
-      // Create a listener and add to the cache
-      listener := coherence.NewMapListener[string, Price]().OnUpdated(func(e coherence.MapEvent[string, Price]) {
-          key, err := e.Key()
-          if err != nil {
-             panic(err)
-          }
-          newValue, err := e.NewValue()
-	      if err != nil {
-             panic(err)
-          }
-          oldValue, err := e.OldValue()
-          if err != nil {
-             panic(err)
-          }
+         // Create a listener and add to the cache
+         listener := coherence.NewMapListener[string, Price]().OnUpdated(func(e coherence.MapEvent[string, Price]) {
+            key, err := e.Key()
+            if err != nil {
+               panic(err)
+            }
+            newValue, err := e.NewValue()
+            if err != nil {
+               panic(err)
+            }
+            oldValue, err := e.OldValue()
+            if err != nil {
+               panic(err)
+            }
 
-         newPrice := newValue.Price
-         oldPrice := oldValue.Price
-         change := newPrice - oldPrice
-         log.Printf("Price changed for %s, new=$%3.2f, old=$%3.2f, change=$%3.2f\n", *key, oldPrice, newPrice, change)
-      })
+            newPrice := newValue.Price
+            oldPrice := oldValue.Price
+            change := newPrice - oldPrice
+            log.Printf("Price changed for %s, new=$%3.2f, old=$%3.2f, change=$%3.2f\n", *key, oldPrice, newPrice, change)
+         })
 
-   if err := prices.AddListener(ctx, listener); err != nil {
-      return err
-   }
+      if err := prices.AddListener(ctx, listener); err != nil {
+         return err
+      }
 
-   select {}
-   }
-   ```
+      select {}
+      }
+      ```
 
 5. Add trades
  
-   ```go
-   func addTrades(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price], options ...string) error {
-      if len(options) != 2 {
-         return fmt.Errorf("you must specify a symbol and count")
-      }
+      ```go
+      func addTrades(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price], options ...string) error {
+         if len(options) != 2 {
+            return fmt.Errorf("you must specify a symbol and count")
+         }
 
-      symbol := options[0]
-      count, err := strconv.Atoi(options[1])
-      if err != nil {
-         return fmt.Errorf("invalid value for count of %v", options[1])
-      }
+         symbol := options[0]
+         count, err := strconv.Atoi(options[1])
+         if err != nil {
+            return fmt.Errorf("invalid value for count of %v", options[1])
+         }
 
-      if count < 0 {
-         return errors.New("count cannot be negative")
-      }
+         if count < 0 {
+            return errors.New("count cannot be negative")
+         }
 
-      symbols, err := getSymbols(prices)
-      if err != nil {
-         return err
-      }
+         symbols, err := getSymbols(prices)
+         if err != nil {
+            return err
+         }
 
-      if !isSymbolValid(symbol, symbols) {
-         return fmt.Errorf("unable to find symbol %s, valid values are %v\n", symbol, symbols)
-      }
+         if !isSymbolValid(symbol, symbols) {
+            return fmt.Errorf("unable to find symbol %s, valid values are %v\n", symbol, symbols)
+         }
 
-      // get the price for the symbol
-      currentPrice, err := prices.Get(ctx, symbol)
-      if err != nil {
-         return err
-      }
+         // get the price for the symbol
+         currentPrice, err := prices.Get(ctx, symbol)
+         if err != nil {
+            return err
+         }
 
-      // add using efficient PutAll
-      buffer := make(map[string]Trade, 0)
+         // add using efficient PutAll
+         buffer := make(map[string]Trade, 0)
 
-      log.Printf("Adding %d random trades for %s...\n", count, symbol)
+         log.Printf("Adding %d random trades for %s...\n", count, symbol)
 
-      for i := 0; i < count; i++ {
-         trade := newTrade(symbol, rand.Intn(1000)+1, currentPrice.Price)
-         buffer[trade.ID] = trade
-         if i%1000 == 0 {
+         for i := 0; i < count; i++ {
+            trade := newTrade(symbol, rand.Intn(1000)+1, currentPrice.Price)
+            buffer[trade.ID] = trade
+            if i%1000 == 0 {
+               err = trades.PutAll(ctx, buffer)
+               if err != nil {
+                  return err
+               }
+               buffer = make(map[string]Trade, 0)
+            }
+         }
+
+         // if anything left in buffer save to Coherence
+         if len(buffer) > 0 {
             err = trades.PutAll(ctx, buffer)
             if err != nil {
                return err
             }
-            buffer = make(map[string]Trade, 0)
          }
-      }
 
-      // if anything left in buffer save to Coherence
-      if len(buffer) > 0 {
-         err = trades.PutAll(ctx, buffer)
-         if err != nil {
-            return err
+         size, err := trades.Size(ctx)
+         if err == nil {
+            log.Printf("Trades cache size is now %d\n", size)
+            fmt.Println()
          }
-      }
 
-      size, err := trades.Size(ctx)
-      if err == nil {
-         log.Printf("Trades cache size is now %d\n", size)
-         fmt.Println()
+         return nil
       }
-
-      return nil
-   }
+      ```
 
 6. Stock split
 
-  ```go
-   func stockSplit(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price], options ...string) error {
-      if len(options) != 2 {
-         return fmt.Errorf("you must specify a symbol and factor")
-      }
-
-      symbol := options[0]
-      factor, err := strconv.Atoi(options[1])
-      if err != nil {
-         return fmt.Errorf("invalid value for factor of %v", options[1])
-      }
-
-      if factor < 1 || factor > 10 {
-         return errors.New("factor must be between 1 and 10")
-      }
-
-      symbols, err := getSymbols(prices)
-      if err != nil {
-         return err
-      }
-
-      if !isSymbolValid(symbol, symbols) {
-         return fmt.Errorf("unable to find symbol %s, valid values are %v\n", symbol, symbols)
-      }
-
-      // get the price for the symbol
-      currentPrice, err := prices.Get(ctx, symbol)
-      if err != nil {
-         return err
-      }
-
-      // the process for the stock split is:
-      // 1. Update each trade and multiply the quantity by the factor
-      // 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
-      // 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
-
-      symbolExtractor := extractors.Extract[string]("symbol")
-
-      ch := coherence.InvokeAllFilter[string, Trade, string](ctx, trades, filters.Equal(symbolExtractor, symbol),
-         processors.Multiply("quantity", factor))
-
-      count := 0
-      for v := range ch {
-         if v.Err != nil {
-            return v.Err
+      ```go
+      func stockSplit(trades coherence.NamedCache[string, Trade], prices coherence.NamedCache[string, Price], options ...string) error {
+         if len(options) != 2 {
+            return fmt.Errorf("you must specify a symbol and factor")
          }
-         count++
-      }
 
-      log.Printf("Updated quantity for %d trades", count)
-
-      count = 0
-      ch2 := coherence.InvokeAllFilter[string, Trade, string](ctx, trades, filters.Equal(symbolExtractor, symbol),
-         processors.Multiply("price", float32(1)/float32(factor)))
-
-      for v := range ch2 {
-         if v.Err != nil {
-            return v.Err
+         symbol := options[0]
+         factor, err := strconv.Atoi(options[1])
+         if err != nil {
+            return fmt.Errorf("invalid value for factor of %v", options[1])
          }
-         count++
+
+         if factor < 1 || factor > 10 {
+            return errors.New("factor must be between 1 and 10")
+         }
+
+         symbols, err := getSymbols(prices)
+         if err != nil {
+            return err
+         }
+
+         if !isSymbolValid(symbol, symbols) {
+            return fmt.Errorf("unable to find symbol %s, valid values are %v\n", symbol, symbols)
+         }
+
+         // get the price for the symbol
+         currentPrice, err := prices.Get(ctx, symbol)
+         if err != nil {
+            return err
+         }
+
+         // the process for the stock split is:
+         // 1. Update each trade and multiply the quantity by the factor
+         // 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
+         // 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
+
+         symbolExtractor := extractors.Extract[string]("symbol")
+
+         ch := coherence.InvokeAllFilter[string, Trade, string](ctx, trades, filters.Equal(symbolExtractor, symbol),
+            processors.Multiply("quantity", factor))
+
+         count := 0
+         for v := range ch {
+            if v.Err != nil {
+               return v.Err
+            }
+            count++
+         }
+
+         log.Printf("Updated quantity for %d trades", count)
+
+         count = 0
+         ch2 := coherence.InvokeAllFilter[string, Trade, string](ctx, trades, filters.Equal(symbolExtractor, symbol),
+            processors.Multiply("price", float32(1)/float32(factor)))
+
+         for v := range ch2 {
+            if v.Err != nil {
+               return v.Err
+            }
+            count++
+         }
+
+         log.Printf("Updated price for %d trades", count)
+
+         _, err = coherence.Invoke[string, Price, float32](ctx, prices, symbol, processors.Multiply("price", float32(1)/float32(factor)))
+
+         log.Printf("Updated price for %s from $%3.2f to $%3.2f\n\n", symbol, currentPrice.Price, currentPrice.Price/float32(factor))
+         // update the price cache
+         return nil
       }
-
-      log.Printf("Updated price for %d trades", count)
-
-      _, err = coherence.Invoke[string, Price, float32](ctx, prices, symbol, processors.Multiply("price", float32(1)/float32(factor)))
-
-      log.Printf("Updated price for %s from $%3.2f to $%3.2f\n\n", symbol, currentPrice.Price, currentPrice.Price/float32(factor))
-      // update the price cache
-      return nil
-   }
-
+      ```
 
 ## Acknowledgements
 
