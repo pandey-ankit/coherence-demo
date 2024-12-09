@@ -443,9 +443,10 @@ For all the clients, by default, data is serialized into JSON and storage as nat
 in this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, 
 but at a high level we set an attribute `@class` in the client data structure and this maps to the 
 server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
- ```bash
+
+```bash
 Trade=com.oracle.coherence.demo.model.Trade
-> Price=com.oracle.coherence.demo.model.Price```
+Price=com.oracle.coherence.demo.model.Price```
 ```
 
 > Note: If you are using the one client to access data, you do not have to have a Java representation.
