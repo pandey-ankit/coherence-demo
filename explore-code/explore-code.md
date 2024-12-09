@@ -139,12 +139,11 @@ In this lab, you will:
 
    **Operational Override**
 
-      The tangosol-coherence.xml operational deployment descriptor, or its override, specifies the operational and run-time settings that control clustering, communication, and data management services.
-      
-      For this demonstration we are configuring federation cluster members in the override file shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/tangosol-coherence-override-grid-edition.xml#L38)
-      or `src/main/resources/tangosol-coherence-override-grid-edition.xml`.
-
-      ```xml
+     The tangosol-coherence.xml operational deployment descriptor, or its override, specifies the operational and run-time settings that control clustering, communication, and data management services.
+     For this demonstration we are configuring federation cluster members in the override file shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/tangosol-coherence-override-grid-edition.xml#L38)
+     or `src/main/resources/tangosol-coherence-override-grid-edition.xml`.
+   
+     ```xml
       <federation-config>
           <participants>   <!-- defines each participant or cluster in the federation setup -->
             <participant>
@@ -422,7 +421,16 @@ In this lab, you will:
 
 ## Task 3: Explore the Application HTML and JavaScript
 
-1. Step 1
+Since the focus of this lab is Coherence, we have not included detailed information about the HTML and Angular components.
+
+The main components are highlight below:
+
+   | Directory / File                                | Description                            | GitHub Link                                                                                                               |
+   |-------------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+   | src/main/resource/web                           | Base directory for the Web application | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/resources/web)                            |
+   | src/main/resources/web/index.html               | Main application entry point           | [Link](https://github.com/coherence-community/coherence-demo/tree/1412/src/main/resources/web/index.html)                 |
+   | src/main/resources/web/javscripts/controller.js | Angular Controller                     | [Link](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/resources/web/javascripts/controllers.js) |
+
   
 ## Task 4: Explore the Python Code
 
@@ -430,6 +438,208 @@ The **Python** code is available in the following location:
   
 * clients/py/main.py
 * [main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)
+
+For all the clients, by default, data is serialized into JSON and storage as native JSON objects in the cluster. 
+in this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, 
+but at a high level we set an attribute `@class` in the client data structure and this maps to the 
+server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
+ ```bash
+Trade=com.oracle.coherence.demo.model.Trade
+> Price=com.oracle.coherence.demo.model.Price```
+```
+
+> Note: If you are using the one client to access data, you do not have to have a Java representation.
+
+A few of the main areas of code have been included below:
+
+1. Define the domain classes
+
+   The ` @serialization.proxy("Price")` defines the Java class that this object will serialize to.
+
+   ```python
+   @dataclass
+   @serialization.proxy("Price")
+   class Price:
+       symbol: str
+       price: float
+
+   @dataclass
+   @serialization.proxy("Trade")
+   class Trade:
+       id: str
+       symbol: str
+       quantity: int
+       price: float
+
+   session: Session
+   prices: NamedCache[str, Price]
+   trades: NamedCache[str, Trade]
+   ``` 
+   
+2. Connect to the Coherence cluster
+   
+   ```python
+   async def init_coherence() -> None:
+       """
+       Initialize Coherence.
+
+       :return: None
+       """
+       global session
+       global prices
+       global trades
+                                          
+       # Uses default of localhost:1408
+       session = await Session.create()   
+       prices = await session.get_cache("Price")
+       trades = await session.get_cache("Trade")
+   ```
+3. Display the cache size
+    
+   ```python
+   async def display_cache_size() -> None:
+       """
+       Displays the size for both the Trade and Price caches.
+
+       :return: None
+       """
+       global prices
+       global trades
+
+       tradesize = await trades.size()
+       pricesize = await prices.size()
+
+       print(f"Trade cache size: {tradesize}")
+       print(f"Price cache size: {pricesize}")
+   ```
+
+4. Monitor prices
+
+   ```python
+   async def monitor_prices() -> None:
+       """
+       Monitors the Price cache for any changes and displays them.
+    
+       :return: None
+       """
+       global prices
+    
+       listener: MapListener[str, Price] = MapListener()
+       listener.on_updated(lambda e: handle_event(e))
+       await prices.add_map_listener(listener)
+    
+       print("Listening for price changes. Press CTRL-C to finish.")
+       await asyncio.sleep(10000)
+     
+   def handle_event(e) -> None:
+       """
+       Event handler to display the event details
+    
+       :return: None
+       """
+       symbol = e.key
+       old_price = e.old.price
+       new_price = e.new.price
+       change = new_price - old_price
+    
+       print(
+            f"Price changed for {symbol}, new=${new_price:.2f}, old=${old_price:.2f}, change=${change:.2f}")
+   ```
+    
+5. Add Trades
+
+   ```python 
+   async def add_trades(symbol: str, count: int) -> None:
+    """
+    Add trades for a symbol.
+
+    :param symbol the symbol to add trades to
+    :param count the number of trades to add
+    :return: None
+    """
+    global prices
+    global trades
+
+    if count <= 0:
+        print("count must be supplied and be positive")
+        return
+                  
+    # Return a list of the valid symbols from Coherence
+    symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
+
+    if symbol in symbols:
+        current_price: Price = await prices.get(symbol)
+
+        buffer: dict[str, Trade] = {}
+        print()
+
+        print(f"{get_time()}: Adding {count} random trades for {symbol}")
+
+        for i in range(0, count):
+            trade_id = str(uuid.uuid1())
+            new_trade: Trade = Trade(trade_id, symbol, random.randint(1, 1000), current_price.price)
+            buffer[trade_id] = new_trade
+            if i % 1000 == 0:
+                await trades.put_all(buffer)
+                buffer.clear()
+
+        # Write anything left
+        if len(buffer) != 0:
+            await trades.put_all(buffer)
+
+        size = await trades.size()
+        print(f"{get_time()}: Size of Trade cache is now {size}")
+    else:
+        print(f"Unable to find {symbol}, valid symbols are {symbols}")
+    ```
+
+6. Stock Split
+
+   ```python 
+   async def stock_split(symbol: str, factor: int) -> None:
+    """
+    Do a stock split.
+
+    :param symbol the symbol to split
+    :param factor the factor to use for the split, e.g. 2 = 2 to 1
+    :return: None
+    """
+    global prices
+    global trades
+
+    if factor <= 0 or factor > 10:
+        print("factor must be supplied and be positive and less than 10")
+        return
+
+    symbols: List[str] = await prices.aggregate(Aggregators.distinct("symbol"))
+
+    if symbol in symbols:
+        current_price: Price = await prices.get(symbol)
+
+        # the process for the stock split is:
+        # 1. Update each trade and multiply the quantity by thr factor
+        # 2. Update each trade and divide the price by the factor (or multiply by 1/factor)
+        # 3. Update the price cache for the symbol and divide the price by the factor (or multiply by 1/factor)
+
+        print()
+        print(f"{get_time()}: Splitting {symbol} using factor of {factor}")
+
+        print(f"{get_time()}: Update quantity for {symbol}")
+        async for _ in trades.invoke_all(Processors.multiply("quantity", factor), None, Filters.equals("symbol", symbol)):
+            break  # ignore
+
+        print(f"{get_time()}: Update price for {symbol}")
+        async for _ in trades.invoke_all(Processors.multiply("price", 1 / factor), None, Filters.equals("symbol", symbol)):
+            break  # ignore
+
+        await prices.invoke(symbol, Processors.multiply("price", 1 / factor))
+
+        new_price = (current_price.price / factor)
+
+        print(f"{get_time()}: Updating price for {symbol} to ${new_price:.2f}")
+    else:
+        print(f"Unable to find {symbol}, valid symbols are {symbols}")
+    ```
 
 ## Task 5: Explore the Javascript Code
 
