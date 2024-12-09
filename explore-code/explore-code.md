@@ -451,11 +451,11 @@ The main components are highlight below:
    Price=com.oracle.coherence.demo.model.Price```
    ```
 
-   > Note: If you are using the one client to access data, you do not have to have a Java representation.
+   If you are using the one client to access data, you do not have to have a Java representation.
 
    A few of the main areas of code have been included below:
 
-1. Define the domain classes
+2. Define the domain classes
 
    The ` @serialization.proxy("Price")` defines the Java class that this object will serialize to.
 
@@ -479,7 +479,7 @@ The main components are highlight below:
    trades: NamedCache[str, Trade]
    ``` 
    
-2. Connect to the Coherence cluster
+3. Connect to the Coherence cluster
    
    ```python
    async def init_coherence() -> None:
@@ -497,7 +497,7 @@ The main components are highlight below:
        prices = await session.get_cache("Price")
        trades = await session.get_cache("Trade")
    ```
-3. Display the cache size
+4. Display the cache size
     
    ```python
    async def display_cache_size() -> None:
@@ -516,7 +516,7 @@ The main components are highlight below:
        print(f"Price cache size: {pricesize}")
    ```
 
-4. Monitor prices
+5. Monitor prices
 
    ```python
    async def monitor_prices() -> None:
@@ -549,7 +549,7 @@ The main components are highlight below:
             f"Price changed for {symbol}, new=${new_price:.2f}, old=${old_price:.2f}, change=${change:.2f}")
    ```
     
-5. Add Trades
+6. Add Trades
 
    ```python 
    async def add_trades(symbol: str, count: int) -> None:
@@ -596,7 +596,7 @@ The main components are highlight below:
         print(f"Unable to find {symbol}, valid symbols are {symbols}")
     ```
 
-6. Stock Split
+7. Stock Split
 
    ```python 
    async def stock_split(symbol: str, factor: int) -> None:
