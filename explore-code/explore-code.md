@@ -31,7 +31,7 @@ In this lab, you will:
 
    ![Directory](images/directory.png "Directory")
 
-## Task 2: Explore the pom.xml, Configuration and Startup
+## Task 2: Explore the pom.xml, configuration and startup
                   
 1. Application Startup
 
@@ -54,11 +54,11 @@ In this lab, you will:
                                                                                                                                                      
    The startup class is [com.oracle.coherence.demo.application.Launcher](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Launcher.java) which does the following:
    
-      * Determines the time zone and sets sensible primary and secondary cluster names as system properties, as well as Jaegar endpoint
-      * Sets the following system property which indicates the cache configuration file to load.
+      * Determines the time zone and sets sensible primary and secondary cluster names using system properties, as well as Jaegar endpoint
+      * Sets the following system property which indicates the cache configuration file to load:
 
          `System.setProperty("coherence.cacheconfig", "cache-config.xml")`
-      * Calls Coherence.main(args) which is the main entry point for coherence.
+      * Calls Coherence.main(args) which is the main entry point for starting coherence
 
  
 2. Configuration Files
@@ -70,7 +70,7 @@ In this lab, you will:
 
       The cache configuration file (cache-config.xml in our case) defines caches and other services, for the cluster. A few areas of particular interest are:
    
-      1. An interceptor shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L46) 
+      1. An interceptor shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L46), 
          which is run on startup of the Coherence cluster: 
          ```xml  
          <interceptors>
@@ -82,7 +82,7 @@ In this lab, you will:
          </interceptors>
          ```
       2. Cache Scheme Mapping, shown below or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L51)
-         defines the mapping from the cache name to a caching scheme and shows the domain classes, explained further below, used for our cache.
+         defines the mapping from the cache name to a caching scheme and shows the domain classes for each cache, which are explained further below.
          ```xml
          <caching-scheme-mapping>
            <cache-mapping>
@@ -100,7 +100,7 @@ In this lab, you will:
          </caching-scheme-mapping>
          ```
       3. Federated Service Definitions, shown in part below or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L71)
-         which defines the actual federated scheme with its read-write backing map to write through to a database (in memory in our case). We can also see the topology is defined as `Active`, which is a reference to the topology in the override file below. 
+         which defines the actual federated scheme with its read-write backing map to write through to a database (in memory database for convenience in our case). We can also see the topology is defined as `Active`, which is a reference to the topology in the override file below. 
          ```xml
            <federated-scheme>
              <scheme-name>federated-scheme</scheme-name>
@@ -135,7 +135,8 @@ In this lab, you will:
             </topologies>
          </federated-scheme>
          ```
-      4. A Http Proxy server which has the JAX-RS resources `ApplicationResourceConfig` which serves the application and `ServiceResourceConfig` which serves various REST endpoints through which the HTML/JavaScript application interacts.
+      4. A Http Proxy server which has the JAX-RS resources [ApplicationResourceConfig](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ApplicationResourceConfig.java) 
+         which serves the static application and [ServiceResourceConfig](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ServiceResourceConfig.java) which serves various REST endpoints through which the HTML/JavaScript application interacts.
 
    **Operational Override**
 
@@ -185,7 +186,7 @@ In this lab, you will:
         
    * `Price` - holds information regarding symbols and their current price
    
-      Source code: `src/main/java/com/oracle/coherence/demo/model/Price.java` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/model/Price.java)
+      Source code: `src/main/java/com/oracle/coherence/demo/model/Price.java` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/model/Price.java)
    
       Class definition (excluding getters/ setters, etc)
    
@@ -216,7 +217,7 @@ In this lab, you will:
 
    * `Trade` - holds individual trades and the price they traded for
         
-      Source Code: `src/main/java/com/oracle/coherence/demo/model/Trade.java` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/model/Trade.java)
+      Source Code: `src/main/java/com/oracle/coherence/demo/model/Trade.java` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/model/Trade.java)
       
       Class definition (excluding getters/ setters, etc)
    
@@ -296,7 +297,7 @@ In this lab, you will:
         }
         ``` 
         
-        The above code loops through the `SYMBOLS`, which is an array of stock symbols, and inserts initial proces.
+        The above code loops through the `SYMBOLS`, which is an array of stock symbols, and inserts initial prices.
 
       * createPositions() , which calls `createPositions(null, NR_POSITIONS_TO_CREATE)`
    
@@ -346,7 +347,7 @@ In this lab, you will:
 
     There are various other components to the Java based JAX-RS application. You can explore the various classes and packages below via the explorer or via the direct GitHub links.
 
-    * ChartDataResource.java in `src/main/java/com/oracle/coherence/demo/application` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)
+    * ChartDataResource.java in `src/main/java/com/oracle/coherence/demo/application` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/ChartDataResource.java)
       
       This class contains a JAX-RS endpoint that is called from the HTML/ JavaScript application, that will do aggregation, get prices and invoke code across all 
       members, to determine the number of Trades each member has. Some relevant code below is:
@@ -380,7 +381,7 @@ In this lab, you will:
       }
       ```
    
-   * EventsResource.java in `src/main/java/com/oracle/coherence/demo/application` or [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)
+   * EventsResource.java in `src/main/java/com/oracle/coherence/demo/application` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/EventsResource.java)
       
      This class contains methods to set up a Server Sent Events (SSE) broadcaster and uses Coherence Map Events to send any changes to the SSE channel.
      Some relevant methods are shown below:
@@ -441,7 +442,7 @@ The main components are highlight below:
    **clients/py/main.py**</br>
    **[main.py](https://github.com/coherence-community/coherence-demo/blob/1412/clients/py/main.py)**
 
-   For all the clients, by default, data is serialized into JSON and storage as native JSON objects in the cluster. 
+   For all the clients, by default, data is serialized into JSON and stored as native JSON objects in the cluster. 
    In this demo we have chosen to convert them to a Java representation so we can execute server side Java code. This is done different ways in each of the clients, but at a high level we set an attribute `@class` in the client data structure and this maps to the server-side `type-aliases.properties` which then converts the JSON objects to their relevant Java class.
 
       ```bash
@@ -680,8 +681,9 @@ The **JavaScript** code is available in the following location:
 
       ```javascript
       if (command === "size") {
-      console.log("Trade cache size = " + (await trades.size))
-      console.log("Price cache size = " + (await prices.size))
+          console.log("Trade cache size = " + (await trades.size))
+          console.log("Price cache size = " + (await prices.size)) 
+      }
       ```
  
 4. Monitor prices
@@ -821,7 +823,7 @@ The **Go code** is available in the following location:
       // create a new Session
       session, err := coherence.NewSession(ctx, coherence.WithPlainText(), coherence.WithRequestTimeout(time.Duration(120)*time.Second))
       err != nil {
-         ic(err)
+         panic(err)
       }
       defer session.Close()
 
@@ -888,7 +890,6 @@ The **Go code** is available in the following location:
       }
 
       select {}
-      }
       ```
 
 5. Add trades
