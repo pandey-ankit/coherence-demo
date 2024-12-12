@@ -1,8 +1,10 @@
-# Gain Insight using Open Tracing
+# Gain Insight using OpenTelemetry or OpenTracing APIs
 
 ## Introduction
       
 This lab will walk you through using OpenTracing to gain visibility in cache operations from the UI, to the cache server and all the way through to the cache store write.
+
+Coherence does not include any tracing implementation libraries. Therefore, the developer needs to provide the desired tracing runtime. Since OpenTracing is no longer maintained, Oracle recommends that you use OpenTelemetry. A minimum version of OpenTelemetry for Java version 1.29 is recommended. Even though OpenTracing is deprecated in Coherence, it is still a supported option when using the latest OpenTracing 0.33.0.
 
 Estimated time: 10 minutes
 
@@ -124,4 +126,4 @@ For this task there is a number, e.g.`[1]` in a square bracket on the image belo
 
 * **Author** - Tim Middleton
 * **Contributors** - Ankit Pandey, Sid Joshi
-* **Last Updated By/Date** - Ankit Pandey, November 2024
+* **Last Updated By/Date** - Ankit Pandey, December 2024
