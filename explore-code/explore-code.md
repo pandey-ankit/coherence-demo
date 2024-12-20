@@ -81,7 +81,7 @@ In this lab, you will:
            </interceptor>
          </interceptors>
          ```
-         > Note: In this context, interceptors allow us to write code to react to various lifecycle events such as when the cache configuration is activated or disposed. In this case we are running the `BootstrapInterceptor` class, explained below, to boostrap the application. Other interceptors can be created to respond to other events such as member left, partition events and cache mutation events.
+         In this context, interceptors allow us to write code to react to various lifecycle events such as when the cache configuration is activated or disposed. In this case we are running the `BootstrapInterceptor` class, explained below, to boostrap the application. Other interceptors can be created to respond to other events such as member left, partition events and cache mutation events.
       2. Cache Scheme Mapping, shown below or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L51)
          defines the mapping from the cache name to a caching scheme and shows the domain classes for each cache, which are explained further below.
          ```xml
