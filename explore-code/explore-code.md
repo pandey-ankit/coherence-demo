@@ -277,7 +277,7 @@ In this lab, you will:
         }
         ```
 
-        The above code retrieves the coherence session from the Coherence instance and uses the session to get a reference to a cache. This is the same for all the caches.  
+        The above code retrieves the coherence session from the Coherence instance and uses the session to get a reference to a cache. Similar code is used for all the caches.  
 
       * addIndexes()
 
