@@ -69,7 +69,7 @@ In this lab, you will:
    **Cache Configuration**
 
       The cache configuration file (cache-config.xml in our case) defines caches and other services, for the cluster. A few areas of particular interest are:
-   
+
       1. An interceptor shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L46), 
          which is run on startup of the Coherence cluster: 
          ```xml  
@@ -81,6 +81,7 @@ In this lab, you will:
            </interceptor>
          </interceptors>
          ```
+         > Note: In this context, interceptors allow us to write code to react to various lifecycle events such as when the cache configuration is activated or disposed. In this case we are running the `BootstrapInterceptor` class, explained below, to boostrap the application. Other interceptors can be created to respond to other events such as member left, partition events and cache mutation events.
       2. Cache Scheme Mapping, shown below or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/cache-config-grid-edition.xml#L51)
          defines the mapping from the cache name to a caching scheme and shows the domain classes for each cache, which are explained further below.
          ```xml
@@ -143,7 +144,7 @@ In this lab, you will:
      The tangosol-coherence.xml operational deployment descriptor, or its override, specifies the operational and run-time settings that control clustering, communication, and data management services.
      For this demonstration we are configuring federation cluster members in the override file shown below, or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/b632f832fe9860e9eb6fb454f13a4158367d0f23/src/main/resources/tangosol-coherence-override-grid-edition.xml#L38)
      or `src/main/resources/tangosol-coherence-override-grid-edition.xml`.
-   
+
      ```xml
       <federation-config>
           <participants>   <!-- defines each participant or cluster in the federation setup -->
@@ -268,8 +269,18 @@ In this lab, you will:
    The `Utilities` class available at `src/main/java/com/oracle/coherence/demo/application/Utilities.java` or on [GitHub](https://github.com/coherence-community/coherence-demo/blob/1412/src/main/java/com/oracle/coherence/demo/application/Utilities.java)
    has various methods that the application calls. We have included some relevant snippets below, which extra tracing code removed, for viewing.
                       
+      * getPricesCache()
+
+        ```java
+        public static NamedCache<String, Price> getPricesCache() {
+            return Coherence.getInstance().getSession().getCache(PRICE_CACHE);
+        }
+        ```
+
+        The above code retrieves the coherence session from the Coherence instance and uses the session to get a reference to a cache. This is the same for all the caches.  
+
       * addIndexes()
-   
+
         ```java
         public static void addIndexes() {
             NamedCache<String, Trade> tradesCache = getTradesCache();
@@ -283,7 +294,7 @@ In this lab, you will:
         ``` 
         
         The above code adds three indexes using value extractors, such as `Trade::getSymbol`, which extract the specified method value
-        and store a deserialized version of this for fast access when issuing queries and aggregations.
+        and stores a deserialized version of this for fast access when issuing queries and aggregations.
 
       * populatePrices()
    
