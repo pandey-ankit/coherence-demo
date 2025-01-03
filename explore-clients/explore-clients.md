@@ -113,8 +113,12 @@ In this lab, you will:
 4. Create an Executable Go Binary using the following:
       ```bash
       <copy>go build -o go-demo .  
-      ls -l go-demo
-      -rwxrwxr-x. 1 opc opc 17663730 Nov 25 01:23 go-demo</copy>
+      ls -l go-demo</copy>
+      ```
+
+      You should see output similar to the following:
+      ```bash
+      -rwxrwxr-x. 1 opc opc 17663730 Nov 25 01:23 go-demo
       ```       
 
 5. Run the following to issue a **3:1** stock split for **`ORCL`** shares which will update the quantity by a factor of 3 and divide the price by a factor of 3.

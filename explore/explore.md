@@ -46,8 +46,8 @@ The following has already been setup in this VM:
 1. Open a new terminal and change to the `coherence-demo` directory and verify the environment.
 
       ```bash
-      cd ~/coherence-demo
-      mvn -v
+      <copy>cd ~/coherence-demo
+      mvn -v</copy>
       ```   
    
    You will have output similar to the following:
@@ -63,7 +63,7 @@ The following has already been setup in this VM:
 2. In the same terminal, issue the following command to start the application:
 
     ```bash
-   mvn exec:exec -P grid-edition
+   <copy>mvn exec:exec -P grid-edition</copy>
    ```
    
    You should see a screen similar to the following showing the welcome message. Click `Close` to continue.
